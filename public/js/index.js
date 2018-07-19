@@ -11,8 +11,8 @@ socket.on('disconnect',function(){
 socket.on('newMessage',function(msg){
   console.log('got new msg: ',msg);
 })
-
-socket.emit('createMessage',{
-  from:'gokusan',
-  text:"ha ha i remenr it",
-})
+// 
+// socket.emit('createMessage',{
+//   from:'gokusan',
+//   text:"ha ha i remenr it",
+// })
