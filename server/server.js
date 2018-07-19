@@ -24,13 +24,13 @@ io.on('connection',(socket)=>{
   //   text:'hey this is a reminder',
   //   createdAt : 123
   // });
-  socket.on('createMessage',(message)=>{
+  socket.on('createMessage',(message,callback)=>{
     console.log('createMessage : ',message);
 
 
 
     io.emit('newMessage',generateMessage(message.from,message.text))
-
+    callback('this is from the server');
     // socket.broadcast.emit('newMessage',{
     //   from:message.from,
     //   text:message.text,
