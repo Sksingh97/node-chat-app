@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO= require('socket.io');
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage,generateLocationMessage} = require('./utils/message');
 const publicPath = path.join(__dirname,'../public');
 
 const port = process.env.PORT || 3000
@@ -16,7 +16,9 @@ app.use(express.static(publicPath));
 
 io.on('connection',(socket)=>{
   console.log("New User Connected");
-
+  socket.on('createLocationMessage',(coords)=>{
+    io.emit('newLocationMessage',generateLocationMessage('Admin',coords.latitude,coords.longitude))
+  })
   socket.emit('newMessage',generateMessage('admin','welcome to chat room'));
   socket.broadcast.emit('newMessage',generateMessage('admin','new user joined the room'))
   // socket.emit('newMessage', {
