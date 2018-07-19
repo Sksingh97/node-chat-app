@@ -1,5 +1,21 @@
 var socket = io();
 
+function scrollToBottom(){
+
+
+var message = $('#messages');
+var newMessage = message.children('li:last-child')
+var clientHeight = message.prop('clientHeight');
+var scrollTop = message.prop('scrollTop');
+var scrollHeight = message.prop('scrollHeight');
+var newMessageHeight = newMessage.innerHeight();
+var lastMessageHeight = newMessage.prev().innerHeight();
+
+if(clientHeight+scrollTop+newMessageHeight+lastMessageHeight >= scrollHeight){
+  message.scrollTop(scrollHeight);
+}
+}
+
 socket.on('connect',function (){
   console.log("connected to server");
 });
@@ -9,22 +25,39 @@ socket.on('disconnect',function(){
 });
 
 socket.on('newMessage',function(msg){
-  // console.log('got new msg: ',msg);
-  var formattedTime = moment(msg.createdAt).format('h:mm a');
-  var li = $('<li></li>');
-  li.text(`${msg.from} ${formattedTime}: ${msg.text}`)
+    var formattedTime = moment(msg.createdAt).format('h:mm a');
+  var template = $('#message-template').html();
+  var html = Mustache.render(template,{
+    text:msg.text,
+    from:msg.from,
+    createdAt: formattedTime
+  });
 
-  $('#messages').append(li);
+  $('#messages').append(html);
+  scrollToBottom();
+  // console.log('got new msg: ',msg);
+  // var formattedTime = moment(msg.createdAt).format('h:mm a');
+  // var li = $('<li></li>');
+  // li.text(`${msg.from} ${formattedTime}: ${msg.text}`)
+  //
+  // $('#messages').append(li);
 });
 socket.on('newLocationMessage',function(message){
   var formattedTime = moment(message.createdAt).format('h:mm a');
-  var li = $('<li></li>');
-  var a =$('<a target="_blank">My current Location</a>');
-
-  li.text(`${message.from} ${formattedTime}:`);
-  a.attr('href',message.url);
-  li.append(a);
-  $('#messages').append(li);
+  var template = $('#location-message-template').html();
+  var html=Mustache.render(template,{
+    from:message.from,
+    url:message.url,
+    createdAt:formattedTime
+  })
+  // var li = $('<li></li>');
+  // var a =$('<a target="_blank">My current Location</a>');
+  //
+  // li.text(`${message.from} ${formattedTime}:`);
+  // a.attr('href',message.url);
+  // li.append(a);
+  $('#messages').append(html);
+    scrollToBottom();
 });
 
 // socket.emit('createMessage',{
