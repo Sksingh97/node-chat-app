@@ -17,12 +17,31 @@ if(clientHeight+scrollTop+newMessageHeight+lastMessageHeight >= scrollHeight){
 }
 
 socket.on('connect',function (){
-  console.log("connected to server");
+  var params = $.deparam(window.location.search);
+
+  socket.emit('join',params, function(err){
+    if(err){
+      alert(err)
+      window.location.href = '/';
+    }else{
+      console.log('no error');
+    }
+  })
+
 });
 
 socket.on('disconnect',function(){
   console.log("Disconnected from server");
 });
+
+socket.on('updateUserList',function(users){
+  var ol = $('<ol></ol>');
+  console.log(users);
+  users.forEach(function (user){
+    ol.append($('<li></li>').text(user));
+  })
+  $('#users').html(ol);
+})
 
 socket.on('newMessage',function(msg){
     var formattedTime = moment(msg.createdAt).format('h:mm a');
@@ -72,7 +91,6 @@ $('#message-form').on('submit',function(e){
   e.preventDefault();
 var messageTextbox = $('[name=message]')
   socket.emit('createMessage',{
-    from:'user',
     text:messageTextbox.val()
   },function(){
     messageTextbox.val('')
